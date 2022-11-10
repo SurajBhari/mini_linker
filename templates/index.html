@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="icon" type="image/x-icon" href="/favicon.ico">
+		<title>Mini Linker</title>
+		<style>
+			body {
+                background: radial-gradient(ellipse at bottom, var(#223344) 0%, var(#090a0f) 100%);
+				background-color: #4e4e4f;
+                background-repeat: no-repeat;
+                background-size: cover;
+                animation: 1s ease-out var(--delay) 1 transitionAnimation; /* duration/timing-function/delay/iterations/name */
+                animation-fill-mode: forwards;
+                position: relative;
+                margin: 0;
+                padding: 0;
+            }
+			.button {
+				background-color: #4CAF50; /* Green */
+				border: none;
+				color: white;
+				padding: 16px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 16px;
+				margin: 4px 2px;
+				transition-duration: 0.4s;
+				cursor: pointer;
+				background-color: #4e4e4f; 
+				color: black; 
+				border: 2px solid #4CAF50;
+			}
+			.loading {
+				visibility : hidden;
+			}
+		</style>
+		<script type="text/javascript">
+			function loading(){
+				let l = document.getElementsByClassName("loading");
+				for (let i = 0; i < l.length; i++) {
+					l[i].style.visibility = "visible";
+				}
+				console.log("Loading");
+			}
+		</script>
+	</head>
+	<body>
+		{% block content %}
+		<center>
+			<form action="#" method="post">
+                <h1>Mini Linker</h1>
+                <h2>Want a Dynamic link that always point to correct stuff ?</h2>
+				<p><input type="text" id="clip" placeholder="Channel ID" name="channel_id" ></p>
+				<p><input type="text" id="keyword" placeholder="Add a keyword (seperated by comma), Leave empty if you want all of that chats." name="keywords"></p>
+				<p><input type="submit" value="Sumbit" onclick="loading();" class="button"/></p>
+			</form>
+		<div class="loading">
+			<img src="https://media.tenor.com/wpSo-8CrXqUAAAAi/loading-loading-forever.gif" id="loading" alt="Loading" width="5%" height="5%" />
+		</div>
+		</center>
+		{% endblock %}
+		<div class="result">
+			<center>
+				<table border="0" id="info-table">
+						<td>
+							<center>
+								<a href={{ thumbnail_link }}><button class="button">Thumbnail</button></a>
+							</center>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<center>
+								<iframe width="426" height="240" src={{ embed_link }} title={{ title }} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> </iframe>
+							</center>
+						</td>
+					</tr> 
+					<tr>
+						<td>
+							<center>
+								<a href={{ video_link }}> {{ title }}</a>
+							</center>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<center>
+								<a href={{ video_direct_link }}><button class="button">Download</button></a>
+							</center>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<center>
+								<p id="description">{{ description }}</p>
+							</center>
+						</td>
+					</tr>
+				</table>
+			</center>
+			<center>
+			<table border="0" class="styled-table answer">
+				<thead>
+					<tr>
+						<th>S. No</th>
+						<th>Name</th>
+						<th>Avatar</th>
+						<th>Direct Link</th>
+						<th>Chat Content</th>
+					</tr>
+				</thead>
+				<tr>
+				{% for i in range(images|length) %}
+					<center>
+						<tr>
+							<td>
+								<center>{{i+1}}.</center>
+							</td>
+							<td>
+								<center><h3> {{names[i]}}</center>
+							</td>
+							<td>
+								<center><img src={{  images[i] }} alt="Sorry, No Display!" border="0" class="avatar"/></center>
+							</td>
+							<td>
+								<center><a href = {{ links[i] }}> {{ timestamps[i] }} </a></center>
+							</td>
+							<td>
+								<center>
+									<p> <h2> {{ chats[i] }} </p>
+								</center>
+							</td>
+						</tr>
+					</center>
+					{% endfor %}   
+			</table>
+
+
+			<div class="chatter-data">
+				<center><h1>Top Chatter Data</center>
+				<table border="0" class="styled-table">
+					<thead>
+						<tr>
+							<th>S. No</th>
+							<th>Name</th>
+							<th>Chat Count</th>
+						</tr>
+					</thead>
+					<tr>
+					{% for i in range(top_chatter_name|length) %}
+						<center>
+							<tr>
+								<td>
+									<center>{{i+1}}.</center>
+								</td>
+								<td>
+									<center><h3> {{top_chatter_name[i]}}</center>
+								</td>
+								<td>
+									<center><h3> {{top_chatter_count[i]}}</center>
+								</td>
+							</tr>
+						</center>
+						{% endfor %}   
+				</table>
+			</div>
+
+			<div class="membership-data">
+				<center><h1>Membership Data</center>
+				<table border="0" class="styled-table">
+					<thead>
+						<tr>
+							<th>S. No</th>
+							<th>Avatar</th>
+							<th>Name</th>
+							<th>Message</th>
+						</tr>
+					</thead>
+					<tr>
+					{% for i in range(new_members|length) %}
+						<center>
+							<tr>
+								<td>
+									<center>{{i+1}}.</center>
+								</td>
+								<td>
+									<center><img src = {{new_members_images[i]}} /></center>
+								</td>
+								<td>
+									<center><h3> {{new_members[i]}}</center>
+								</td>
+								<td>
+									<center><h3> {{new_members_m[i]}}</center>
+								</td>
+							</tr>
+						</center>
+						{% endfor %}   
+				</table>
+			</div>
+
+			<div class="superchat-data">
+				<center><h1>Superchat Data</center>
+				<table border="0" class="styled-table">
+					<thead>
+						<tr>
+							<th>S. No</th>
+							<th>Avatar</th>
+							<th>Name</th>
+							<th>Amount</th>
+							<th>Message</th>
+						</tr>
+					</thead>
+					<tr>
+					{% for i in range(superchat_users|length) %}
+						<center>
+							<tr>
+								<td>
+									<center>{{i+1}}.</center>
+								</td>
+								<td>
+									<center><img src = {{superchat_users_images[i]}} /></center>
+								</td>
+								<td>
+									<center><h3> {{superchat_users[i]}}</center>
+								</td>
+								<td>
+									<center><h3> {{superchat_ammounts[i]}}</center>
+								</td>
+								<td>
+									{% if superchat_messages[i] != None %}
+										{% if superchat_messages[i].startswith('http') %}
+										<center> <img src = {{superchat_messages[i]}} /> </center>
+										{% else %}
+										<center><h3> {{superchat_messages[i]}}</center>
+										{% endif %} 
+									{% endif %} 
+								</td>
+							</tr>
+						</center>
+						{% endfor %}   
+				</table>
+			</div>
+			<center> <h1> Chat Count : {{chat_count}} </center>
+			<center> <h1> New Member Count : {{new_members|length}} </center>
+			<center> <h1> Superchat/sticker Income : {{income_count}} </center>
+		</div>
+		<footer width="100%" class="footerend">
+			<center> <h3> Made by <a href="https://github.com/AG4lyf"> Suraj </a>, <a href="https://github.com/AG4lyf/clip_finder"> Source Code </a> </center>
+		</footer>
+	</body>
+</html>
