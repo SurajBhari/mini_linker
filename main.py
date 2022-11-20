@@ -12,7 +12,14 @@ livee_accepted = ["live", "stream", "streaming", "l"]
 short_accepted = ["short", "s", "shorts", "shortlink", "shortlink", "shortlinks", "shortlinks"]
 video_accepted = ["video", "videos", "vid", "vids", "v"]
 
-def gen_link(id, phone="pc"):
+def gen_link(id, phone="pc", channel=False):
+    if channel:
+        if phone == "android":
+            return f"vnd.youtube://channel/{id}"
+        elif phone == "iphone":
+            return f"youtube://www.youtube.com/channel/{id}"    
+        else:
+            return f"https://www.youtube.com/channel/{id}"
     print(f"phone is {phone}")
     if phone == "android":
         link = f"vnd.youtube:{id}"
@@ -61,7 +68,10 @@ def get_video(playlist, phone="pc"):
         return video["id"]
     return ""
 
-
+@app.route("/<channel>", methods=["GET", "POST"])
+def channel_only(channel):
+    print("channel_only")
+    return main(channel, "v")
 @app.route("/<channel>/<ctype>", methods= ["GET", "POST"])
 def main(channel, ctype):    
     #print methods used
@@ -76,6 +86,8 @@ def main(channel, ctype):
         print(request.user_agent.platform)
         print(request.user_agent)
     print(phone)
+    if not ctype:
+        return redirect(gen_link(channel, phone, channel=True))
     ctype = ctype.lower()
     playlist = Playlist(playlist_from_channel_id(channel))
     video_data = Video.get(playlist.videos[0]['id'])
@@ -100,10 +112,16 @@ def main(channel, ctype):
     else:
         return empty(channel)
     print(vid)
+    ch = False
+
+    if not vid:
+        vid = channel
+        ch = True
+
     dic = {"time": datetime.now(), "channel_id": channel, "resultant_id": vid, "type": ctype}
     logs.append(dic)
     print("added to logs cuz not found")
-    return redirect(gen_link(vid, phone))
+    return redirect(gen_link(vid, phone, ch))
 
 @app.route("/", methods=["POST", "GET"])
 def empty():
@@ -125,4 +143,4 @@ def empty():
 # who wrote this garbage code anyway :P 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, host="0.0.0.0", port=5000)
