@@ -98,6 +98,10 @@ def main(channel, ctype):
     vid = ""
     ctype = ctype[0]
     for prev in logs:
+        if (datetime.now() - prev["time"]).seconds > 360:
+            logs.remove(prev)
+            # clean to keep up performance
+            continue
         if ctype == prev["type"] and channel == prev["channel_id"] and (datetime.now() - prev["time"]).seconds < 300:
             print("found in previous attempt")
             vid = prev["resultant_id"]
