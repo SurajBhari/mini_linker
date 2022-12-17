@@ -3,6 +3,7 @@ from youtubesearchpython import Video, Channel, Playlist, playlist_from_channel_
 from json import load, dumps
 from datetime import datetime
 
+import scrapetube
 app = Flask(__name__)
 
 # time, channel_id, resultant_id, type
@@ -30,48 +31,20 @@ def gen_link(id, phone="pc", channel=False):
     print(link)
     return link
 
-def get_live(playlist):
-    for video in playlist.videos:
-        video_data = Video.get(video["id"])
-        if not video_data["isLiveContent"]:
-            continue
-        return video["id"]
-    return ""
+def get_live(c_id):
+    return scrapetube.get_channel(c_id, content_type="streams")
 
-def get_short(playlist):
-    for video in playlist.videos:
-        video_data = Video.get(video["id"])
-        video_reso = video_data["streamingData"]["adaptiveFormats"][0] 
-        if video_data["isLiveContent"]:
-            print("is live content")
-            continue
-        if int(video_reso["width"]) > int(video_reso["height"]):
-            print("is not vertical")
-            continue
-        if int(video_data["duration"]["secondsText"]) > 61:
-            print("is longer than 60 seconds")
-            continue
+def get_short(c_id):
+    return scrapetube.get_channel(c_id, content_type="shorts")
 
-        return video["id"]
-    return ""
-
-def get_video(playlist, phone="pc"):
-    for video in playlist.videos:
-        video_data = Video.get(video["id"])
-        video_reso = video_data["streamingData"]["adaptiveFormats"][0] 
-        if(video_data["isLiveContent"]):
-            print("is live content")
-            continue
-        if int(video_reso["width"]) < int(video_reso["height"]) or int(video_data["duration"]["secondsText"]) < 61:
-            print("is vertical or shorter than 60 seconds")
-            continue
-        return video["id"]
-    return ""
+def get_video(c_id):
+    return scrapetube.get_channel(channel_id=c_id, content_type="videos")
 
 @app.route("/<channel>", methods=["GET", "POST"])
 def channel_only(channel):
     print("channel_only")
     return main(channel, "v")
+
 @app.route("/<channel>/<ctype>", methods= ["GET", "POST"])
 def main(channel, ctype):    
     #print methods used
@@ -89,11 +62,6 @@ def main(channel, ctype):
     if not ctype:
         return redirect(gen_link(channel, phone, channel=True))
     ctype = ctype.lower()
-    playlist = Playlist(playlist_from_channel_id(channel))
-    video_data = Video.get(playlist.videos[0]['id'])
-
-    with open("video_data.json", "w") as f:
-        f.write(dumps(video_data, indent=4))
     
     vid = ""
     ctype = ctype[0]
@@ -108,11 +76,11 @@ def main(channel, ctype):
             return redirect(gen_link(vid, phone))
             break
     if ctype in livee_accepted:
-        vid = get_live(playlist=playlist)
+        vid = get_live(channel)
     elif ctype in short_accepted:
-        vid = get_short(playlist=playlist)
+        vid = get_short(channel)
     elif ctype in video_accepted:
-        vid = get_video(playlist=playlist)
+        vid = get_video(channel)
     else:
         return empty(channel)
     print(vid)
@@ -121,6 +89,9 @@ def main(channel, ctype):
     if not vid:
         vid = channel
         ch = True
+    else:
+        vid = str(next(vid)["videoId"])
+        print(vid)
 
     dic = {"time": datetime.now(), "channel_id": channel, "resultant_id": vid, "type": ctype}
     logs.append(dic)
@@ -138,10 +109,12 @@ def empty():
     if not channel:
         return render_template("index.html", show=False)
 
-    playlist = Playlist(playlist_from_channel_id(channel))
-    last_live = get_live(playlist)
-    last_short = get_short(playlist)
-    last_video = get_video(playlist)
+    last_live = get_live(channel)
+    last_live = next(last_live)["videoId"]
+    last_short = get_short(channel)
+    last_short = next(last_short)["videoId"]
+    last_video = get_video(channel)
+    last_video = next(last_video)["videoId"]
     return render_template("index.html", last_live=last_live, last_short=last_short, last_video=last_video, show=True)
 
 # who wrote this garbage code anyway :P 
