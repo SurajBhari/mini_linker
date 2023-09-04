@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from youtubesearchpython import Video, Channel, Playlist, playlist_from_channel_id
 from json import load, dumps
 from datetime import datetime
@@ -57,7 +57,7 @@ def get_video(c_id):
 @app.route("/<channel>", methods=["GET", "POST"])
 def channel_only(channel):
     print("channel_only")
-    return main(channel, "v")
+    return redirect(gen_link(channel, channel=True))
 
 
 @app.route("/<channel>/<ctype>", methods=["GET", "POST"])
@@ -134,12 +134,10 @@ def empty():
     if not channel:
         return render_template("index.html", show=False)
 
-    last_live = get_live(channel)
-    last_live = next(last_live)["videoId"]
-    last_short = get_short(channel)
-    last_short = next(last_short)["videoId"]
-    last_video = get_video(channel)
-    last_video = next(last_video)["videoId"]
+    print(url_for("main", channel=channel, ctype="l"))
+    last_live = url_for("main", channel=channel, ctype="l")
+    last_short = url_for("main", channel=channel, ctype="s")
+    last_video = url_for("main", channel=channel, ctype="v")
     return render_template(
         "index.html",
         last_live=last_live,
