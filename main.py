@@ -83,7 +83,6 @@ def main(channel, ctype):
         ):
             vid = prev["resultant_id"]
             return redirect(gen_link(vid, phone))
-            break
     if ctype in livee_accepted:
         vid = get_live(channel)
     elif ctype in short_accepted:
@@ -98,8 +97,10 @@ def main(channel, ctype):
         vid = channel
         ch = True
     else:
-        vid = str(next(vid)["videoId"])
-
+        try:
+            vid = str(next(vid)["videoId"])
+        except StopIteration:
+            return f"Nothing found for {ctype} for this channel | Are you sure you are not in wrong place ?"
     dic = {
         "time": datetime.now(),
         "channel_id": channel,
