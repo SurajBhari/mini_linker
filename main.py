@@ -31,14 +31,12 @@ def gen_link(id, phone="pc", channel=False):
             return f"youtube://www.youtube.com/channel/{id}"
         else:
             return f"https://www.youtube.com/channel/{id}"
-    print(f"phone is {phone}")
     if phone == "android":
         link = f"vnd.youtube:{id}"
     elif phone == "iphone":
         link = f"youtube://watch?v={id}"
     else:
         link = f"https://www.youtube.com/watch?v={id}"
-    print(link)
     return link
 
 
@@ -56,24 +54,17 @@ def get_video(c_id):
 
 @app.route("/<channel>", methods=["GET", "POST"])
 def channel_only(channel):
-    print("channel_only")
     return redirect(gen_link(channel, channel=True))
 
 
 @app.route("/<channel>/<ctype>", methods=["GET", "POST"])
 def main(channel, ctype):
-    # print methods used
-    print(request.method)
-    # find if the request is from a phone or a computer
     if "Android" in request.headers.get("User-Agent"):
         phone = "android"
     elif "iPhone" in request.headers.get("User-Agent"):
         phone = "iphone"
     else:
         phone = "pc"
-        print(request.user_agent.platform)
-        print(request.user_agent)
-    print(phone)
     if not ctype:
         return redirect(gen_link(channel, phone, channel=True))
     ctype = ctype.lower()
@@ -90,7 +81,6 @@ def main(channel, ctype):
             and channel == prev["channel_id"]
             and (datetime.now() - prev["time"]).seconds < 300
         ):
-            print("found in previous attempt")
             vid = prev["resultant_id"]
             return redirect(gen_link(vid, phone))
             break
@@ -102,7 +92,6 @@ def main(channel, ctype):
         vid = get_video(channel)
     else:
         return empty(channel)
-    print(vid)
     ch = False
 
     if not vid:
@@ -110,7 +99,6 @@ def main(channel, ctype):
         ch = True
     else:
         vid = str(next(vid)["videoId"])
-        print(vid)
 
     dic = {
         "time": datetime.now(),
@@ -119,7 +107,6 @@ def main(channel, ctype):
         "type": ctype,
     }
     logs.append(dic)
-    print("added to logs cuz not found")
     return redirect(gen_link(vid, phone, ch))
 
 
@@ -130,11 +117,9 @@ def empty():
         return render_template("index.html", show=False)
 
     channel = request.form["channel_id"]
-    print(f"channel is {channel}")
     if not channel:
         return render_template("index.html", show=False)
 
-    print(url_for("main", channel=channel, ctype="l"))
     last_live = url_for("main", channel=channel, ctype="l")
     last_short = url_for("main", channel=channel, ctype="s")
     last_video = url_for("main", channel=channel, ctype="v")
@@ -150,4 +135,4 @@ def empty():
 # who wrote this garbage code anyway :P
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5555)
