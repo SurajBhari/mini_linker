@@ -1,11 +1,36 @@
 # Mini Linker
 
-Introducing Mini Linker, a convenient tool to create links that always direct to the Latest Video, Latest Short, and Latest Livestream of your YouTube channel. Seamlessly open links in the app for a user-friendly experience.
+A small Flask service that creates **permanent short links that always redirect to a YouTube channel's *latest* content** — newest video, newest Short, or current/most-recent livestream. Share one link once; it never goes stale.
 
-Utilize the Mini Linker website provided in the right tab to simplify the process. Streamline access to your latest content with ease.
+On mobile it opens the YouTube app directly via deep links (`vnd.youtube://` on Android, `youtube://` on iOS); on desktop it falls back to a normal `youtube.com` URL.
 
-Example:
-![image](https://github.com/SurajBhari/mini_linker/assets/45149585/30a725b6-d975-42dd-ba41-7c3ebc63ad15) </br>
-[Live](/UC5XTxQsO3KapW09nOVE1TJQ/l)
-[Video](/UC5XTxQsO3KapW09nOVE1TJQ/v)
-[Short](/UC5XTxQsO3KapW09nOVE1TJQ/s)
+## Link format
+
+```text
+/<channel_id>/<type>
+```
+
+| Type | Meaning |
+|------|---------|
+| `l` (or `live`, `stream`) | Latest / live stream |
+| `v` (or `video`) | Latest video |
+| `s` (or `short`) | Latest Short |
+
+**Example** (channel `UC5XTxQsO3KapW09nOVE1TJQ`):
+
+- Live → `/UC5XTxQsO3KapW09nOVE1TJQ/l`
+- Video → `/UC5XTxQsO3KapW09nOVE1TJQ/v`
+- Short → `/UC5XTxQsO3KapW09nOVE1TJQ/s`
+
+![Mini Linker](https://github.com/SurajBhari/mini_linker/assets/45149585/30a725b6-d975-42dd-ba41-7c3ebc63ad15)
+
+## How it works
+
+The latest content for a channel is fetched with [`scrapetube`](https://github.com/dermasmid/scrapetube) and `youtube-search-python`, then the request is redirected to the right URL based on the requesting device. Resolved IDs are cached so repeat hits are fast.
+
+## Run locally
+
+```bash
+pip install -r requirements.txt
+python main.py
+```
