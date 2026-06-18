@@ -1,3 +1,4 @@
 flask
 youtube-search-python
+scrapetube
 gunicorn
