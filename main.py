@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, url_for
-from youtubesearchpython import Video, Channel, Playlist, playlist_from_channel_id
 from json import load, dumps
 from datetime import datetime
 
