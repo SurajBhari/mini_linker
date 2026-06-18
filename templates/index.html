@@ -1,68 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<link rel="icon" type="image/x-icon" href="/favicon.ico">
-		<title>Mini Linker</title>
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    	<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-		<style>
-			body {
-                background: radial-gradient(ellipse at bottom, var(#223344) 0%, var(#090a0f) 100%);
-				background-color: #4e4e4f;
-                background-repeat: no-repeat;
-                background-size: cover;
-            }
-			.button {
-				background-color: #4CAF50; /* Green */
-				border: none;
-				color: white;
-				padding: 16px 32px;
-				text-align: center;
-				text-decoration: none;
-				display: inline-block;
-				font-size: 16px;
-				margin: 4px 2px;
-				transition-duration: 0.4s;
-				cursor: pointer;
-				background-color: #4e4e4f; 
-				color: black; 
-				border: 2px solid #4CAF50;
-			}
-			.result {
-				visibility : hidden;
-				{% if show == True%}
-					visibility : visible;
-				{% endif %}
-			}
-		</style>
-	</head>
-	<body>
-		{% block content %}
-		<center>
-			<form action="#" method="post">
-                <h1>Mini Linker</h1>
-                <h2>Want a Dynamic link that always point to correct stuff ?</h2>
-				<p><input type="text" id="clip" placeholder="Channel ID" name="channel_id" ></p>
-				<p><input type="submit" value="Sumbit" onclick="loading();" class="btn btn-primary"/></p>
-			</form>
-		</center>
-		{% endblock %}
-		<div class="result">
-			<center>
-				{% if last_live != "" %}
-					<a href="{{last_live}}" target="_blank"><button class="btn btn-secondary">Live</button></a>
-				{% endif %}
-				
-				{% if last_video != "" %}
-					<a href="{{last_video}}" target="_blank"><button class="btn btn-secondary">Video</button></a>
-				{% endif %}
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<title>Mini Linker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EAF0FF; --ink:#0E1430; --accent:#2D5BFF; --pink:#FF5DA2; --yellow:#FFD23F;
+    --border:3px solid var(--ink); --shadow:6px 6px 0 var(--ink);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;
+    background-image:radial-gradient(var(--ink) 1.2px,transparent 1.2px);background-size:26px 26px;background-position:-13px -13px;
+  }
+  .badge{position:fixed;top:24px;left:24px;background:var(--yellow);border:var(--border);box-shadow:var(--shadow);
+    padding:6px 14px;font-weight:700;transform:rotate(-4deg);font-size:14px}
+  .wrap{width:100%;max-width:680px;text-align:center}
+  .kicker{display:inline-block;background:var(--accent);color:#fff;border:var(--border);box-shadow:var(--shadow);
+    padding:6px 16px;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:13px;transform:rotate(2deg);margin-bottom:22px}
+  h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(50px,11vw,112px);line-height:.88;letter-spacing:-3px}
+  h1 .pop{color:var(--accent);display:inline-block;transform:rotate(-2deg)}
+  .sub{font-size:18px;font-weight:500;margin:18px auto 32px;opacity:.85;max-width:520px}
+  form{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  input[type=text]{flex:1;min-width:240px;font-family:'DM Sans';font-size:18px;font-weight:500;padding:18px 20px;border:var(--border);background:#fff;box-shadow:var(--shadow);outline:none}
+  input[type=text]:focus{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink)}
+  .submit{font-family:'Syne';font-weight:800;font-size:18px;cursor:pointer;padding:18px 30px;border:var(--border);background:var(--accent);color:#fff;box-shadow:var(--shadow);transition:.08s}
+  .submit:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink)}
+  .submit:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+  .results{margin-top:34px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  .pill{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);background:#fff;border:var(--border);box-shadow:var(--shadow);
+    font-family:'Syne';font-weight:800;font-size:18px;padding:16px 26px;transition:.1s}
+  .pill:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--ink)}
+  .pill.live{background:#FF5436;color:#fff}
+  .pill.video{background:var(--yellow)}
+  .pill.short{background:var(--pink);color:#fff}
+  .how{margin-top:40px;font-size:14px;font-weight:500;opacity:.8;line-height:1.6}
+  .how code{background:#fff;border:2px solid var(--ink);padding:1px 7px;font-weight:700}
+  footer{position:fixed;bottom:18px;font-size:13px;font-weight:500;opacity:.6}
+</style>
+</head>
+<body>
+  <div class="badge">always fresh ✦</div>
+  <div class="wrap">
+    <span class="kicker">Mini Linker</span>
+    <h1>ONE LINK,<br><span class="pop">LATEST</span> VID.</h1>
+    <p class="sub">Drop a YouTube channel ID and get permanent links that always jump to the newest video, Short, or livestream.</p>
+    <form action="/" method="post">
+      <input type="text" name="channel_id" placeholder="Channel ID  (UC…)" autofocus required>
+      <input type="submit" class="submit" value="MAKE LINKS →">
+    </form>
 
-				{% if last_short != "" %}
-					<a href="{{last_short}}" target="_blank"><button class="btn btn-secondary">Short</button></a>
-				{% endif %}
-			</center>
-		</div>
-	</body>
+    {% if show == True %}
+    <div class="results">
+      {% if last_live != "" %}<a class="pill live" href="{{ last_live }}" target="_blank">▶ Live</a>{% endif %}
+      {% if last_video != "" %}<a class="pill video" href="{{ last_video }}" target="_blank">🎬 Video</a>{% endif %}
+      {% if last_short != "" %}<a class="pill short" href="{{ last_short }}" target="_blank">⚡ Short</a>{% endif %}
+    </div>
+    {% endif %}
+
+    <p class="how">
+      Each link is reusable &mdash; share it once, it never goes stale.<br>
+      Pattern: <code>/&lt;channel_id&gt;/l</code> &middot; <code>/v</code> &middot; <code>/s</code>
+    </p>
+  </div>
+  <footer>built by Suraj &middot; github.com/SurajBhari</footer>
+</body>
 </html>
