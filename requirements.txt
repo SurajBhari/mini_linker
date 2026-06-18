@@ -1,2 +1,2 @@
 flask
-youtube-search-python
+youtube-search-pythongunicorn
