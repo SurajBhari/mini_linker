@@ -1,5 +1,9 @@
 # Mini Linker
 
+![Python](https://img.shields.io/badge/Python-3670A0?style=flat&logo=python&logoColor=ffdd54)
+![Flask](https://img.shields.io/badge/Flask-000000?style=flat&logo=flask&logoColor=white)
+![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=flat&logo=youtube&logoColor=white)
+
 A small Flask service that creates **permanent short links that always redirect to a YouTube channel's *latest* content** — newest video, newest Short, or current/most-recent livestream. Share one link once; it never goes stale.
 
 On mobile it opens the YouTube app directly via deep links (`vnd.youtube://` on Android, `youtube://` on iOS); on desktop it falls back to a normal `youtube.com` URL.
